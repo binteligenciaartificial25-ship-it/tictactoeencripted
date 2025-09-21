@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piedra, Papel o Tijera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+
+    <div id="game-container" class="bg-white rounded-xl shadow-2xl p-6 md:p-10 w-full max-w-lg text-center transform transition-all duration-300">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-2">Piedra, Papel o Tijera</h1>
+        <p class="text-gray-500 mb-6 md:mb-8 text-sm md:text-base">Elige tu jugada para el desafío encriptado</p>
+        
+        <div id="choice-buttons" class="grid grid-cols-3 gap-4 md:gap-6 mb-8">
+            <button onclick="makeChoice('piedra')" class="choice-btn bg-gray-200 text-gray-700 py-4 px-2 rounded-xl text-lg md:text-xl font-bold hover:bg-gray-300 transition-colors duration-200 ease-in-out">
+                ✊<br class="md:hidden"> Piedra
+            </button>
+            <button onclick="makeChoice('papel')" class="choice-btn bg-gray-200 text-gray-700 py-4 px-2 rounded-xl text-lg md:text-xl font-bold hover:bg-gray-300 transition-colors duration-200 ease-in-out">
+                ✋<br class="md:hidden"> Papel
+            </button>
+            <button onclick="makeChoice('tijera')" class="choice-btn bg-gray-200 text-gray-700 py-4 px-2 rounded-xl text-lg md:text-xl font-bold hover:bg-gray-300 transition-colors duration-200 ease-in-out">
+                ✌️<br class="md:hidden"> Tijera
+            </button>
+        </div>
+
+        <div id="result-container" class="hidden">
+            <p id="result-text" class="text-xl md:text-2xl font-semibold mb-4 text-gray-800"></p>
+            <div id="result-code-container" class="bg-gray-100 border border-gray-300 rounded-lg p-4 md:p-6 mb-4 overflow-hidden break-words">
+                <p class="text-gray-600 mb-2 text-sm">Tu código secreto (copia y envía):</p>
+                <code id="result-code" class="select-all text-sm md:text-base font-mono text-gray-800"></code>
+            </div>
+            <button onclick="copyCode()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl transition-colors duration-200 ease-in-out w-full md:w-auto">
+                Copiar código
+            </button>
+            <div id="copy-message" class="mt-2 text-sm text-green-600 opacity-0 transition-opacity duration-300">¡Copiado!</div>
+        </div>
+
+        <div id="resolve-container" class="hidden mt-8">
+            <p class="text-gray-600 mb-4 text-lg">Ingresa el código de la otra persona para ver el resultado:</p>
+            <input type="text" id="opponent-code" placeholder="Pega el código aquí..." class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+            <button onclick="resolveGame()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-xl transition-colors duration-200 ease-in-out w-full md:w-auto">
+                Revelar resultado
+            </button>
+        </div>
+
+        <div id="final-result" class="hidden text-2xl md:text-3xl font-extrabold mt-6 text-gray-800"></div>
+    </div>
+
+    <script>
+        let myChoice = '';
+
+        function makeChoice(choice) {
+            myChoice = choice;
+            const seed = Math.random().toString(36).substring(2);
+            const encryptedChoice = btoa(choice + ':' + seed);
+            
+            document.getElementById('choice-buttons').classList.add('hidden');
+            document.getElementById('result-container').classList.remove('hidden');
+            document.getElementById('result-text').innerText = 'Tu jugada: ' + choice.charAt(0).toUpperCase() + choice.slice(1);
+            document.getElementById('result-code').innerText = encryptedChoice;
+            document.getElementById('resolve-container').classList.remove('hidden');
+        }
+
+        function copyCode() {
+            const code = document.getElementById('result-code');
+            const range = document.createRange();
+            range.selectNode(code);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            try {
+                const successful = document.execCommand('copy');
+                const msg = document.getElementById('copy-message');
+                msg.classList.remove('opacity-0');
+                msg.classList.add('opacity-100');
+                setTimeout(() => {
+                    msg.classList.remove('opacity-100');
+                    msg.classList.add('opacity-0');
+                }, 2000);
+            } catch (err) {
+                console.error('Error al copiar el código: ', err);
+            }
+            window.getSelection().removeAllRanges();
+        }
+
+        function resolveGame() {
+            const opponentCode = document.getElementById('opponent-code').value;
+            try {
+                const decoded = atob(opponentCode);
+                const [opponentChoice, seed] = decoded.split(':');
+                
+                let result = '';
+                if (myChoice === opponentChoice) {
+                    result = "¡Empate! 🤝";
+                } else if (
+                    (myChoice === 'piedra' && opponentChoice === 'tijera') ||
+                    (myChoice === 'papel' && opponentChoice === 'piedra') ||
+                    (myChoice === 'tijera' && opponentChoice === 'papel')
+                ) {
+                    result = "¡Ganaste! 🎉";
+                } else {
+                    result = "¡Perdiste! 😔";
+                }
+
+                document.getElementById('final-result').innerText = `Tu jugada: ${myChoice.toUpperCase()} vs. Su jugada: ${opponentChoice.toUpperCase()}. ¡${result}`;
+                document.getElementById('final-result').classList.remove('hidden');
+                
+            } catch (e) {
+                document.getElementById('final-result').innerText = "Código inválido. Por favor, revisa el código.";
+                document.getElementById('final-result').classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
