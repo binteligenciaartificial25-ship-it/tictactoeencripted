@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Porcentaje Pokémon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #d32f2f;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .input-group {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #388e3c;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2e7d32;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculadora Pokémon</h1>
+    <p>
+        En la primera fase de nuestro proyecto de IA, hemos confirmado una **relación lineal** entre el Poder de Combate (PC) de un Pokémon y su porcentaje de competencia. Esto nos permite ahora pasar a la fase práctica: la **predicción del porcentaje**.
+    </p>
+    <p>
+        Ingresa el Valor Individual (IV) del Pokémon. Calcularemos su porcentaje con respecto al máximo de copa, que es de **500 IV**.
+    </p>
+
+    <div class="input-group">
+        <label for="ivValue">Ingresar el Valor Individual (IV):</label>
+        <input type="number" id="ivValue" placeholder="Ej: 472" min="0" max="500">
+    </div>
+
+    <button onclick="calculatePercentage()">Calcular Porcentaje</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    function calculatePercentage() {
+        // Obtiene el valor ingresado por el usuario
+        const ivInput = document.getElementById('ivValue');
+        const ivValue = ivInput.value;
+        const resultDiv = document.getElementById('result');
+
+        // Validamos que el campo no esté vacío
+        if (ivValue === '') {
+            resultDiv.textContent = 'Por favor, ingresa un valor.';
+            return;
+        }
+
+        // Convertimos el valor a un número flotante
+        const iv = parseFloat(ivValue);
+        const maxIV = 500;
+
+        // Validamos que el valor esté dentro del rango esperado (0-500)
+        if (iv < 0 || iv > maxIV) {
+            resultDiv.textContent = 'El valor debe estar entre 0 y 500.';
+            return;
+        }
+
+        // Aplicamos la fórmula para calcular el porcentaje
+        const percentage = (iv / maxIV) * 100;
+        const formattedPercentage = percentage.toFixed(2).replace('.', ','); // Formato con coma para el resultado
+
+        // Mostramos el resultado en el div
+        resultDiv.textContent = `El Pokémon que ingresaste es de ${formattedPercentage}%`;
+    }
+</script>
+
+</body>
+</html>
